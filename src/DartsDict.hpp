@@ -45,7 +45,7 @@ public:
   */
   static DartsDictPtr NewFromDict(const Dict& thatDict);
 
-  static DartsDictPtr NewFromFile(FILE* fp);
+  static DartsDictPtr NewFromFile(DataStreamPtr fp);
 
 private:
   DartsDict();

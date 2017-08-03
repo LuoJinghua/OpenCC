@@ -39,6 +39,11 @@ public:
   static void SkipUtf8Bom(FILE* fp);
 
   /**
+  * Detect UTF8 BOM and skip it.
+  */
+  static void SkipUtf8Bom(DataStreamPtr fp);
+
+  /**
   * Returns the length in byte for the next UTF8 character.
   * On error returns 0.
   */
@@ -74,29 +79,31 @@ public:
   /**
   * Returns the length in byte for the previous UTF8 character.
   */
-  static size_t PrevCharLength(const char* str) {
-    {
+  static size_t PrevCharLength(const char* str, size_t len = 3) {
+    if (len >= 3) {
       const size_t length = NextCharLengthNoException(str - 3);
       if (length == 3) {
         return length;
       }
     }
-    {
+    if (len >= 1) {
       const size_t length = NextCharLengthNoException(str - 1);
       if (length == 1) {
         return length;
       }
     }
-    {
+    if (len >= 2) {
       const size_t length = NextCharLengthNoException(str - 2);
       if (length == 2) {
         return length;
       }
     }
     for (size_t i = 4; i <= 6; i++) {
-      const size_t length = NextCharLengthNoException(str - i);
-      if (length == i) {
-        return length;
+      if (len >= i) {
+        const size_t length = NextCharLengthNoException(str - i);
+        if (length == i) {
+          return length;
+        }
       }
     }
     throw InvalidUTF8(str);

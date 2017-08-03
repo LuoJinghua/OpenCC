@@ -55,14 +55,15 @@ static DictEntry* ParseKeyValues(const char* buff, size_t lineNum) {
   }
 }
 
-static LexiconPtr ParseLexiconFromFile(FILE* fp) {
-  const int ENTRY_BUFF_SIZE = 4096;
-  char buff[ENTRY_BUFF_SIZE];
+static LexiconPtr ParseLexiconFromFile(DataStreamPtr fp) {
   LexiconPtr lexicon(new Lexicon);
   UTF8Util::SkipUtf8Bom(fp);
   size_t lineNum = 1;
-  while (fgets(buff, ENTRY_BUFF_SIZE, fp)) {
-    lexicon->Add(ParseKeyValues(buff, lineNum));
+  while (!fp->eof()) {
+    std::string line = fp->getLine();
+    if (line.empty() && fp->eof())
+        break;
+    lexicon->Add(ParseKeyValues(line.c_str(), lineNum));
     lineNum++;
   }
   return lexicon;
@@ -73,12 +74,12 @@ TextDict::TextDict(const LexiconPtr& _lexicon)
 
 TextDict::~TextDict() {}
 
-TextDictPtr TextDict::NewFromSortedFile(FILE* fp) {
+TextDictPtr TextDict::NewFromSortedFile(DataStreamPtr fp) {
   const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
   return TextDictPtr(new TextDict(lexicon));
 }
 
-TextDictPtr TextDict::NewFromFile(FILE* fp) {
+TextDictPtr TextDict::NewFromFile(DataStreamPtr fp) {
   const LexiconPtr& lexicon = ParseLexiconFromFile(fp);
   lexicon->Sort();
   return TextDictPtr(new TextDict(lexicon));

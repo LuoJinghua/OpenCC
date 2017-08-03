@@ -18,6 +18,7 @@
 
 #include "BinaryDict.hpp"
 #include "DartsDict.hpp"
+#include "DataStream.hpp"
 #include "darts.h"
 #include "Lexicon.hpp"
 
@@ -90,25 +91,25 @@ Optional<const DictEntry*> DartsDict::MatchPrefix(const char* word) const {
 
 LexiconPtr DartsDict::GetLexicon() const { return lexicon; }
 
-DartsDictPtr DartsDict::NewFromFile(FILE* fp) {
+DartsDictPtr DartsDict::NewFromFile(DataStreamPtr fp) {
   DartsDictPtr dict(new DartsDict());
 
   Darts::DoubleArray* doubleArray = new Darts::DoubleArray();
   size_t headerLen = strlen(OCDHEADER);
   void* buffer = malloc(sizeof(char) * headerLen);
-  size_t bytesRead = fread(buffer, sizeof(char), headerLen, fp);
+  size_t bytesRead = fp->read(buffer, headerLen);
   if (bytesRead != headerLen || memcmp(buffer, OCDHEADER, headerLen) != 0) {
     throw InvalidFormat("Invalid OpenCC dictionary header");
   }
   free(buffer);
 
-  size_t dartsSize;
-  bytesRead = fread(&dartsSize, sizeof(size_t), 1, fp);
-  if (bytesRead * sizeof(size_t) != sizeof(size_t)) {
+  unsigned dartsSize = 0;
+  bytesRead = fp->read(&dartsSize, sizeof(unsigned));
+  if (bytesRead * sizeof(unsigned) != sizeof(unsigned)) {
     throw InvalidFormat("Invalid OpenCC dictionary header (dartsSize)");
   }
   buffer = malloc(dartsSize);
-  bytesRead = fread(buffer, 1, dartsSize, fp);
+  bytesRead = fp->read(buffer, dartsSize);
   if (bytesRead != dartsSize) {
     throw InvalidFormat("Invalid OpenCC dictionary size of darts mismatch");
   }
@@ -150,8 +151,8 @@ void DartsDict::SerializeToFile(FILE* fp) const {
 
   fwrite(OCDHEADER, sizeof(char), strlen(OCDHEADER), fp);
 
-  size_t dartsSize = dict.total_size();
-  fwrite(&dartsSize, sizeof(size_t), 1, fp);
+  unsigned dartsSize = static_cast<unsigned>(dict.total_size());
+  fwrite(&dartsSize, sizeof(dartsSize), 1, fp);
   fwrite(dict.array(), sizeof(char), dartsSize, fp);
 
   internal->binary.reset(new BinaryDict(lexicon));

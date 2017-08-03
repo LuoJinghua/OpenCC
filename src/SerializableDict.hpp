@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Dict.hpp"
+#include "FileSystem.hpp"
 
 namespace opencc {
 /**
@@ -47,20 +48,13 @@ public:
   template <typename DICT>
   static bool TryLoadFromFile(const string& fileName,
                               std::shared_ptr<DICT>* dict) {
-      FILE* fp =
-#ifdef _MSC_VER
-          // well, the 'GetPlatformString' shall return a 'wstring'
-          _wfopen(UTF8Util::GetPlatformString(fileName).c_str(), L"rb")
-#else
-          fopen(UTF8Util::GetPlatformString(fileName).c_str(), "rb")
-#endif // _MSC_VER
-          ;
-
-    if (fp == NULL) {
+    FileSystemPtr fs = FileSystem::getFileSystem();
+    DataStreamPtr fp = fs->open(fileName);
+    if (!fp) {
       return false;
     }
     std::shared_ptr<DICT> loadedDict = DICT::NewFromFile(fp);
-    fclose(fp);
+    fp->close();
     *dict = loadedDict;
     return true;
   }

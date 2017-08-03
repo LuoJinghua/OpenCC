@@ -30,7 +30,7 @@ Optional<const DictEntry*> Dict::MatchPrefix(const char* word) const {
     if (!result.IsNull()) {
       return result;
     }
-    len -= static_cast<long>(UTF8Util::PrevCharLength(wordTruncPtr));
+    len -= static_cast<long>(UTF8Util::PrevCharLength(wordTruncPtr, len));
   }
   return Optional<const DictEntry*>::Null();
 }

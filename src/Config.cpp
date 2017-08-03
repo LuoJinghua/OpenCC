@@ -23,6 +23,7 @@
 #include "Converter.hpp"
 #include "DartsDict.hpp"
 #include "DictGroup.hpp"
+#include "FileSystem.hpp"
 #include "MaxMatchSegmentation.hpp"
 #include "TextDict.hpp"
 
@@ -166,23 +167,20 @@ public:
   }
 
   string FindConfigFile(string fileName) {
-    std::ifstream ifs;
+    FileSystemPtr fs = FileSystem::getFileSystem();
 
     // Working directory
-    ifs.open(UTF8Util::GetPlatformString(fileName).c_str());
-    if (ifs.is_open()) {
+    if (fs->exists(fileName)) {
       return fileName;
     }
     // Package data directory
     if (PACKAGE_DATA_DIRECTORY != "") {
       string prefixedFileName = PACKAGE_DATA_DIRECTORY + fileName;
-      ifs.open(UTF8Util::GetPlatformString(prefixedFileName).c_str());
-      if (ifs.is_open()) {
+      if (fs->exists(prefixedFileName)) {
         return prefixedFileName;
       }
       prefixedFileName += ".json";
-      ifs.open(UTF8Util::GetPlatformString(prefixedFileName).c_str());
-      if (ifs.is_open()) {
+      if (fs->exists(prefixedFileName)) {
         return prefixedFileName;
       }
     }
@@ -198,9 +196,9 @@ Config::~Config() { delete (ConfigInternal*)internal; }
 ConverterPtr Config::NewFromFile(const string& fileName) {
   ConfigInternal* impl = (ConfigInternal*)internal;
   string prefixedFileName = impl->FindConfigFile(fileName);
-  std::ifstream ifs(UTF8Util::GetPlatformString(prefixedFileName));
-  string content(std::istreambuf_iterator<char>(ifs),
-                 (std::istreambuf_iterator<char>()));
+  FileSystemPtr fs = FileSystem::getFileSystem();
+  DataStreamPtr ifs = fs->open(prefixedFileName);
+  string content = ifs ? ifs->getAsString() : "";
 
 #if defined(_WIN32) || defined(_WIN64)
   UTF8Util::ReplaceAll(prefixedFileName, "\\", "/");

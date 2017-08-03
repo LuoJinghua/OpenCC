@@ -34,7 +34,7 @@ public:
 
   virtual void SerializeToFile(FILE* fp) const;
 
-  static BinaryDictPtr NewFromFile(FILE* fp);
+  static BinaryDictPtr NewFromFile(DataStreamPtr fp);
 
   const LexiconPtr& GetLexicon() const { return lexicon; }
 
@@ -46,8 +46,8 @@ private:
   string valueBuffer;
 
   void ConstructBuffer(string& keyBuffer, vector<size_t>& keyOffset,
-                       size_t& keyTotalLength, string& valueBuffer,
+                       unsigned& keyTotalLength, string& valueBuffer,
                        vector<size_t>& valueOffset,
-                       size_t& valueTotalLength) const;
+                       unsigned& valueTotalLength) const;
 };
 }

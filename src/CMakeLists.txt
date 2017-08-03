@@ -15,12 +15,14 @@ set(
   ConversionChain.hpp
   Converter.hpp
   DartsDict.hpp
+  DataStream.hpp
   Dict.hpp
   DictConverter.hpp
   DictEntry.hpp
   DictGroup.hpp
   Exception.hpp
   Export.hpp
+  FileSystem.hpp
   Lexicon.hpp
   MaxMatchSegmentation.hpp
   Optional.hpp
@@ -43,10 +45,12 @@ set(
   ConversionChain.cpp
   Converter.cpp
   DartsDict.cpp
+  DataStream.cpp
   Dict.cpp
   DictConverter.cpp
   DictEntry.cpp
   DictGroup.cpp
+  FileSystem.cpp
   MaxMatchSegmentation.cpp
   PhraseExtract.cpp
   SimpleConverter.cpp

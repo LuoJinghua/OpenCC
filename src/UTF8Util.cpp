@@ -17,6 +17,7 @@
  */
 
 #include "UTF8Util.hpp"
+#include "DataStream.hpp"
 
 using namespace opencc;
 
@@ -41,6 +42,33 @@ void UTF8Util::SkipUtf8Bom(FILE* fp) {
     for (n--; n >= 0; n--) {
       ungetc(bom[n], fp);
     }
+  }
+
+  /* Otherwise, BOM is already skipped */
+}
+
+void UTF8Util::SkipUtf8Bom(DataStreamPtr fp) {
+  /* UTF-8 BOM is EF BB BF */
+  if (!fp) {
+      return;
+  }
+  /* If we are not at beginning of file, return */
+  if (fp->tell() != 0) {
+      return;
+  }
+
+  /* Try to read first 3 bytes */
+  unsigned char bom[3];
+  size_t n = fp->read(bom, 3);
+
+  if (n != 3) {
+    fp->seek(0);
+    return;
+  }
+  /* If we can only read <3 bytes, push them back */
+  /* Or if first 3 bytes is not BOM, push them back */
+  if ((n < 3) || (bom[0] != 0xEF) || (bom[1] != 0xBB) || (bom[2] != 0xBF)) {
+    fp->seek(0);
   }
 
   /* Otherwise, BOM is already skipped */

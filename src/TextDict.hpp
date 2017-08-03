@@ -49,9 +49,9 @@ public:
   */
   static TextDictPtr NewFromDict(const Dict& dict);
 
-  static TextDictPtr NewFromFile(FILE* fp);
+  static TextDictPtr NewFromFile(DataStreamPtr fp);
 
-  static TextDictPtr NewFromSortedFile(FILE* fp);
+  static TextDictPtr NewFromSortedFile(DataStreamPtr fp);
 
 private:
   const size_t maxLength;
