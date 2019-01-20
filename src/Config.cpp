@@ -230,7 +230,7 @@ ConverterPtr Config::NewFromString(const string& json,
   }
 
   ConfigInternal* impl = (ConfigInternal*)internal;
-  if (configDirectory.back() == '/' || configDirectory.back() == '\\')
+  if (configDirectory.empty() || configDirectory.back() == '/' || configDirectory.back() == '\\')
     impl->configDirectory = configDirectory;
   else
     impl->configDirectory = configDirectory + '/';
