@@ -29,8 +29,8 @@ namespace internal {
 bool ContainsPunctuation(const PhraseExtract::UTF8StringSlice8Bit& word) {
   static const vector<PhraseExtract::UTF8StringSlice8Bit> punctuations = {
       " ",  "\n", "\r", "\t", "-",  ",",  ".",  "?",  "!",  "*", "　",
-      "，", "。", "、", "；", "：", "？", "！", "…",  "“",  "”", "「",
-      "」", "—",  "－", "（", "）", "《", "》", "．", "／", "＼"};
+      "，\0", "。\0", "、\0", "；\0", "：\0", "？\0", "！\0", "…\0",  "“\0",  "”\0", "「\0",
+      "」\0", "—\0",  "－\0", "（\0", "）\0", "《\0", "》\0", "．\0", "／\0", "＼\0"};
   for (const auto& punctuation : punctuations) {
     if (word.FindBytePosition(punctuation) !=
         static_cast<PhraseExtract::UTF8StringSlice8Bit::LengthType>(-1)) {
